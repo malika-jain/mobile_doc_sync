@@ -1,0 +1,402 @@
+{
+	"info": {
+		"_postman_id": "f46fc1ca-90d6-46d9-bcee-22d8b43beb92",
+		"name": "Document_Sync",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Set_Csrf_Token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "767497bb-a725-498b-ac73-5546942c0757",
+						"exec": [
+							"var x = postman.getResponseCookie(\"csrftoken\").value;",
+							"pm.environment.set(\"csrfmiddlewaretoken\", x);",
+							" console.log(x);",
+							" ",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/api/set_csrf_cookie/?",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"api",
+						"set_csrf_cookie",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login_With_Email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a4574419-3211-48c1-bde4-c763828d86be",
+						"exec": [
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"if (responseCode.code === 200){",
+							"    ",
+							"    try {",
+							"        var jsonData = JSON.parse(responseBody);",
+							"        pm.environment.set(\"usid\", jsonData.response.usid);",
+							"        pm.environment.set(\"apid\", jsonData.response.apid);",
+							"        pm.environment.set(\"Doc_search_date_to\", jsonData.result.last_visit);",
+							"        pm.environment.set(\"_sid\", jsonData.result.sid);",
+							"        pm.environment.set(\"falcon_token\", jsonData.result.falcon_token);",
+							"    }",
+							"    catch(e){",
+							"        console.log(e);",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": " csrftoken={{csrfmiddlewaretoken}}; app_version={{app_version}}; device_name={{iphone}}; ios_version={{OS_Version}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "test.auto1@sentieo.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Sentieo@123",
+							"type": "text"
+						},
+						{
+							"key": "csrfmiddlewaretoken",
+							"value": "{{csrfmiddlewaretoken}}",
+							"type": "text"
+						},
+						{
+							"key": "loc",
+							"value": "{{loc_ios}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{user_app_url}}/api/login_1/",
+					"host": [
+						"{{user_app_url}}"
+					],
+					"path": [
+						"api",
+						"login_1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch_Doc",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "41b367ce-aca4-40aa-9c02-640974971aab",
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"var doc_array_count = jsonData.result.docs.length;",
+							"console.log(doc_array_count);",
+							"//reset ispdfcount",
+							" var x = 0 ;",
+							" var y = 0;",
+							"var new_Array = [];",
+							"var new_Doc_Title_Array = [];",
+							"var new_Doc_Ticker_Array = [];",
+							"var new_Doc_Pdf_Array = [];",
+							"var new_Doc_Type_Array = [];",
+							"var new_Doc_page_count = [];",
+							"",
+							"",
+							"for (i= 0 ;i<doc_array_count; i++ ) {",
+							"var isPdfTrue = jsonData.result.docs[i].is_pdf_doc;",
+							"if (isPdfTrue === true) {",
+							"   ",
+							"pm.globals.get(\"Global_Is_Pdf_true\");",
+							"  x++;",
+							"pm.globals.set(\"Global_Is_Pdf_true\", x); // get global var ",
+							"// increment global var",
+							"// save global var   ",
+							"} else if(isPdfTrue === false || true ) {",
+							"    ",
+							"    pm.globals.get(\"Global_Is_Pdf_false\");",
+							"  y++;",
+							"  pm.globals.set(\"Global_Is_Pdf_false\", y);",
+							"    ",
+							"  // get global var ",
+							"// increment global var",
+							"// save global var    ",
+							"}",
+							"",
+							"new_Array.push(jsonData.result.docs[i].id);",
+							"new_Doc_Title_Array.push(jsonData.result.docs[i].title);",
+							"new_Doc_Ticker_Array.push(jsonData.result.docs[i].ticker);",
+							"new_Doc_Pdf_Array.push(jsonData.result.docs[i].is_pdf_doc);",
+							"new_Doc_Type_Array.push(jsonData.result.docs[i].doc_type);",
+							"new_Doc_page_count.push(jsonData.result.docs[i].size);",
+							"",
+							"console.log(new_Array);",
+							"console.log(new_Doc_Title_Array);",
+							"console.log(new_Doc_Ticker_Array);",
+							"console.log(new_Doc_Pdf_Array);",
+							"console.log(new_Doc_Type_Array);",
+							"console.log(new_Doc_page_count);",
+							"",
+							"",
+							"",
+							"",
+							"}",
+							"//console.log(new_Array);",
+							"//console.log(new_Doc_Title_Array);",
+							"//console.log(new_Doc_Ticker_Array);",
+							"//console.log(new_Doc_Pdf_Array);",
+							"pm.globals.set(\"Global_Doc_ids\", new_Array);",
+							"pm.globals.set(\"Global_Doc_Title\", new_Doc_Title_Array);",
+							"pm.globals.set(\"Global_Doc_Pdf\", new_Doc_Pdf_Array);",
+							"pm.globals.set(\"Global_Doc_Type_Array\", new_Doc_Type_Array);",
+							"pm.globals.set(\"Global_Doc_Page_count\", new_Doc_page_count);",
+							"",
+							"",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response time is less than 3000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://app.sentieo.com/api/fetch_search/?size=20&filing_type=ef#$tt#$ppt#$note#$ni#$gbf#$rr#$nw#$&filing_subtype=8-k%20earnings",
+					"protocol": "https",
+					"host": [
+						"app",
+						"sentieo",
+						"com"
+					],
+					"path": [
+						"api",
+						"fetch_search",
+						""
+					],
+					"query": [
+						{
+							"key": "size",
+							"value": "20"
+						},
+						{
+							"key": "filing_type",
+							"value": "ef"
+						}
+					],
+					"hash": "$tt#$ppt#$note#$ni#$gbf#$rr#$nw#$&filing_subtype=8-k%20earnings"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new_bookmark_note",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "f2363e91-41d4-4eab-b1a6-1d0aac4c5885",
+						"exec": [
+							"var globalsDocsIds = pm.globals.get(\"Global_Doc_ids\");",
+							"var globalsDocsTitles = pm.globals.get(\"Global_Doc_Title\");",
+							"var globalsDocsTickers = pm.globals.get(\"Global_Doc_Ticker\");",
+							"var Global_Doc_Pdfs = pm.globals.get(\"Global_Doc_Pdf\");",
+							"var Global_Docs_types = pm.globals.get(\"Global_Doc_Type_Array\");",
+							"",
+							"",
+							"",
+							"console.log(\"globalsDocsIds is ---\"+globalsDocsIds);",
+							"var current_Id = globalsDocsIds[0];",
+							"var current_Title = globalsDocsTitles[0];",
+							"var current_Ticker = globalsDocsTickers[0];",
+							"var current_Pdf = Global_Doc_Pdfs[0];",
+							"var current_Docs_types = Global_Docs_types[0];",
+							"",
+							"",
+							"",
+							"console.log(\"Current Id is ---\"+current_Id);",
+							"globalsDocsIds.shift();",
+							"console.log(\"Current Id is ---\"+globalsDocsIds);",
+							"globalsDocsTitles.shift();",
+							"globalsDocsTickers.shift();",
+							"Global_Docs_types.shift();",
+							"",
+							"",
+							"pm.globals.set(\"Global_Doc_ids\", globalsDocsIds);",
+							"pm.globals.set(\"Global_Doc_Title\", globalsDocsTitles);",
+							"pm.globals.set(\"Global_Doc_Ticker\", globalsDocsTickers);",
+							"pm.globals.set(\"Global_Doc_Ticker\", globalsDocsTickers);",
+							"",
+							"",
+							"pm.environment.set(\"Doc_ID\",current_Id);",
+							"console.log(\"Doc_ID is ---\"+ current_Id);",
+							"pm.environment.set(\"Doc_Title\",current_Title);",
+							"pm.environment.set(\"Doc_Ticker\",current_Ticker);",
+							"",
+							"",
+							"//var current_Title = doc_Title.shift();",
+							"//var current_Ticker = doc_Ticker.shift();",
+							"//var current_Pdf_status = is_Pdf_Doc.shift();",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3b1473ab-fe25-45de-8113-356329dc375b",
+						"exec": [
+							"var globalsDocsIds = pm.globals.get(\"Global_Doc_ids\");",
+							"console.log(\"globalsDocsIds Count is-------\"+ globalsDocsIds.length);",
+							"if (globalsDocsIds.length > 0) {",
+							"    console.log(\"INSIDE\");",
+							"  postman.setNextRequest('new_bookmark_note');",
+							"  ",
+							"}  else if (globalsDocsIds.length == 10) {",
+							"    ",
+							"    postman.setNextRequest('Fetch_Doc');",
+							"}",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response time is less than 3000ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "app_version={{app_version}}; device_name=iphone; ios_version={{OS_Version}}; usid={{usid}}; apid={{apid}}; csrftoken={{csrfmiddlewaretoken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "doc_id",
+							"value": "{{Doc_ID}}",
+							"type": "text"
+						},
+						{
+							"key": "doc_title",
+							"value": "{{Doc_Title}}",
+							"type": "text"
+						},
+						{
+							"key": "csrfmiddlewaretoken",
+							"value": "{{csrfmiddlewaretoken}}",
+							"type": "text"
+						},
+						{
+							"key": "doc_ticker",
+							"value": "{{Doc_Ticker}}",
+							"type": "text"
+						},
+						{
+							"key": "is_pdf_doc",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "loc",
+							"value": "{{loc_ios}}",
+							"type": "text"
+						},
+						{
+							"key": "apikey",
+							"value": "{{usid}}",
+							"type": "text"
+						},
+						{
+							"key": "thisId",
+							"value": "{{apid}}",
+							"type": "text"
+						},
+						{
+							"key": "update",
+							"value": "true",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{user_app_url}}/api/new_bookmark_note/",
+					"host": [
+						"{{user_app_url}}"
+					],
+					"path": [
+						"api",
+						"new_bookmark_note",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

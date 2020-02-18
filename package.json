@@ -1,0 +1,15 @@
+{
+  "name": "postman_newman_jenkins",
+  "version": "1.0.0",
+  "description": "Mobile_Doc_Sync",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "api_tests_production": "newman run tests/Document_Sync.postman_collection.json -e tests/Sentieo_Main_App.postman_environment.json -g tests/Doc_sync.postman_globals.json -r cli,junit"
+  },
+  "author": "Malika Jain",
+  "dependencies": {
+    "newman": "^4.4.1"
+  }
+}
